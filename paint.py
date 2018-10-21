@@ -4,42 +4,32 @@ import numpy as np
 import time
 class mouse:
     def __init__(self, input_img_name):
-        #マウス入力用のパラメータ
-        self.mouseEvent = {"x":None, "y":None, "event":None, "flags":None}
-        #マウス入力の設定
+        self.x=None
+        self.y=None
+        self.event=None
+        self.flags=None
         cv2.setMouseCallback(input_img_name, self.__CallBackFunc, None)
-    
-    #コールバック関数
+
     def __CallBackFunc(self, eventType, x, y, flags, userdata):
-        
-        self.mouseEvent["x"] = x
-        self.mouseEvent["y"] = y
-        self.mouseEvent["event"] = eventType    
-        self.mouseEvent["flags"] = flags    
-
-    #マウス入力用のパラメータを返すための関数
-    def getData(self):
-        return self.mouseEvent
+        self.x = x
+        self.y = y
+        self.event = eventType    
+        self.flags = flags    
     
-    #マウスイベントを返す関数
     def getEvent(self):
-        return self.mouseEvent["event"]                
+        return self.event              
 
-    #マウスフラグを返す関数
     def getFlags(self):
-        return self.mouseEvent["flags"]                
+        return self.flags                
 
-    #xの座標を返す関数
     def getX(self):
-        return self.mouseEvent["x"]  
+        return self.x
 
-    #yの座標を返す関数
     def getY(self):
-        return self.mouseEvent["y"]  
+        return self.y 
 
-    #xとyの座標を返す関数
     def getPos(self):
-        return np.array((self.mouseEvent["x"], self.mouseEvent["y"]))
+        return np.array((self.x,self.y))
 
 
 class pencil:
@@ -78,12 +68,8 @@ def filling(img, pos, color, win_name):
     buff_color = np.copy(img[pos[1]][pos[0]])
     
     while len(pos_queue) != 0:
-        #cv2.imshow(win_name,img)
-        #cv2.waitKey(1)
+
         tmp_color = np.copy(img[pos_queue[0][1]][pos_queue[0][0]])
-        #print(pos_queue)
-        #print(buff_color)
-        #print(tmp_color)
 
         if  tmp_color[0] == buff_color[0] and tmp_color[1] == buff_color[1] and tmp_color[2] == buff_color[2]:
             img[pos_queue[0][1]][pos_queue[0][0]][0] = color[0]
@@ -99,7 +85,7 @@ def filling(img, pos, color, win_name):
                     else:
                         pass
         pos_queue.pop(0)
-        #print(searched_img)
+
 
 
 if __name__ == "__main__":
