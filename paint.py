@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 import time
+
 class mouse:
     def __init__(self, input_img_name):
         self.x=None
@@ -85,8 +86,7 @@ def filling(img, pos, color, win_name):
                     else:
                         pass
         pos_queue.pop(0)
-
-
+        
 
 if __name__ == "__main__":
     try:
