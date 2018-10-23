@@ -41,7 +41,7 @@ class palette:
         self.input_img = input_img
         self.color = np.array([0, 0, 0])
         self.mode = None
-        self.alpha = None
+        self.alpha = 0.9
         self.draw = False
 
     def __CallBackFunc(self, pos):
@@ -132,8 +132,7 @@ if __name__ == "__main__":
             elif k == ord('r') or k == ord('R'):
                 read_raw = cv2.flip(read_raw,0)
                 out_bin = cv2.flip(out_bin,0)
-                mode = paletteData.getMode()
-                show_img = cv2.addWeighted(read_raw, mode[1]/100, out_bin, 1-mode[1]/100, 0)
+                
             elif paletteData.cursor.getEvent() == cv2.EVENT_LBUTTONDOWN:
                 paletteData.getColor()
 
@@ -161,8 +160,9 @@ if __name__ == "__main__":
                 elif mode[0] == 1:
                     paletteData.draw = False
                     filling(out_bin, pos, color, output_window_name)
-                show_img = cv2.addWeighted(read_raw, mode[1]/100, out_bin, 1-mode[1]/100, 0)
 
+            mode = paletteData.getMode()
+            show_img = cv2.addWeighted(read_raw, float(mode[1])/100.0, out_bin, 1.0-float(mode[1])/100.0, 0)
             cv2.imshow(window_name,show_img)
             cv2.imshow(output_window_name,out_bin)
             cv2.imshow(palette_name,palette_img)
@@ -171,4 +171,6 @@ if __name__ == "__main__":
         print(traceback.format_exc())
     finally:
         cv2.destroyAllWindows()
-        input(">>")
+        k = input("Save? : ")
+        if k == 'y' or k == 'Y':
+            cv2.imwrite("bin_img/img_433.png",out_bin)
