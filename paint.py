@@ -1,14 +1,13 @@
 ﻿#-*-coding:utf-8-*-
 import cv2
 import numpy as np
-import time
 
 class mouse:
     def __init__(self, input_img_name):
-        self.x=None
-        self.y=None
-        self.event=None
-        self.flags=None
+        self.x = None
+        self.y = None
+        self.event = None
+        self.flags = None
         cv2.setMouseCallback(input_img_name, self.__CallBackFunc, None)
 
     def __CallBackFunc(self, eventType, x, y, flags, userdata):
@@ -33,29 +32,33 @@ class mouse:
         return np.array((self.x,self.y))
 
 
-class pencil:
-    def __init__(self, input_img_name):
-        cv2.createTrackbar('R', input_img_name, 0, 1, self.__CallBackFunc)
-        cv2.createTrackbar('G', input_img_name, 0, 1, self.__CallBackFunc)
-        cv2.createTrackbar('B', input_img_name, 0, 1, self.__CallBackFunc)
+class palette:
+    def __init__(self, input_img_name, input_img):
+        cv2.createTrackbar('alpha', input_img_name, 0, 100, self.__CallBackFunc)
         cv2.createTrackbar("Mode", input_img_name, 0, 1, self.__CallBackFunc)
+        self.cursor = mouse(input_img_name)
         self.input_img_name = input_img_name
+        self.input_img = input_img
         self.color = np.array([0, 0, 0])
         self.mode = None
+        self.alpha = None
         self.draw = False
 
     def __CallBackFunc(self, pos):
-        r = cv2.getTrackbarPos("R", self.input_img_name)
-        g = cv2.getTrackbarPos("G", self.input_img_name)
-        b = cv2.getTrackbarPos("B", self.input_img_name)
-        self.color = np.array([b,g,r])
         self.mode = cv2.getTrackbarPos("Mode", self.input_img_name)
+        self.alpha = cv2.getTrackbarPos("alpha", self.input_img_name)
 
     def getColor(self):
+        pos = self.cursor.getPos()
+        b = self.input_img[pos[1]][pos[0]][0]
+        g = self.input_img[pos[1]][pos[0]][1]
+        r = self.input_img[pos[1]][pos[0]][2]
+        self.color = np.array([b,g,r])
         return self.color
 
     def getMode(self):
-        return self.mode
+        out = np.array([self.mode,self.alpha])
+        return out
 
 def filling(img, pos, color, win_name):
     """
@@ -86,7 +89,18 @@ def filling(img, pos, color, win_name):
                     else:
                         pass
         pos_queue.pop(0)
-        
+
+def ColorPalette():
+    colors = np.array([[[0,0,0],[255,255,255]],[[255,0,0],[0,255,0]],[[0,0,255],[0,255,255]]])
+    palette_size = 60
+    color_palette = np.zeros((palette_size * colors.shape[0],palette_size * colors.shape[1],colors.shape[2]))
+
+    for i in np.arange(colors.shape[0]):
+       for j in np.arange(colors.shape[1]):
+           Color = (int(colors[i][j][0]),int(colors[i][j][1]),int(colors[i][j][2]))                
+           cv2.rectangle(color_palette,(j * palette_size,i * palette_size),((j + 1) * palette_size,(i + 1) * palette_size),Color,-1)
+
+    return color_palette
 
 if __name__ == "__main__":
     try:
@@ -102,24 +116,28 @@ if __name__ == "__main__":
         cv2.namedWindow(output_window_name, cv2.WINDOW_NORMAL)
         cv2.namedWindow(palette_name, cv2.WINDOW_NORMAL)
 
+        palette_img = ColorPalette()
         mouseData = mouse(window_name)
-        pencilData = pencil(palette_name)
+        paletteData = palette(palette_name,palette_img)
 
         while True:
             
             k = cv2.waitKey(1)
             if mouseData.getEvent() == cv2.EVENT_LBUTTONDOWN:
-                pencilData.draw = True
+                paletteData.draw = True
             elif mouseData.getEvent() == cv2.EVENT_LBUTTONUP:    
-                pencilData.draw = False
-            elif mouseData.getEvent() == cv2.EVENT_RBUTTONDOWN or k == ord('q'):
+                paletteData.draw = False
+            elif k == ord('Q') or k == ord('q'):
                 break
             elif k == ord('r') or k == ord('R'):
                 read_raw = cv2.flip(read_raw,0)
                 out_bin = cv2.flip(out_bin,0)
-                show_img = cv2.addWeighted(read_raw, 0.9, out_bin, 0.1, 0)
+                mode = paletteData.getMode()
+                show_img = cv2.addWeighted(read_raw, mode[1]/100, out_bin, 1-mode[1]/100, 0)
+            elif paletteData.cursor.getEvent() == cv2.EVENT_LBUTTONDOWN:
+                paletteData.getColor()
 
-            if pencilData.draw == True:
+            if paletteData.draw == True:
                 pos = mouseData.getPos()
                 if pos[0] >= show_img.shape[1]:
                     pos[0] = show_img.shape[1] - 1
@@ -130,23 +148,24 @@ if __name__ == "__main__":
                 if pos[1] < 0:
                     pos[1] = 0
 
-                color = pencilData.getColor()
-                mode = pencilData.getMode()
+                color = paletteData.color
+                mode = paletteData.getMode()
 
                 color[color >= 1] = 255
                 print(pos)
                 print(show_img[pos[1]][pos[0]])
                 print(color)
-                print(pencilData.getMode())
-                if mode == 0:
+                print(paletteData.getMode())
+                if mode[0] == 0:
                     cv2.line(out_bin,(pos[0],pos[1]),(pos[0],pos[1]),(int(color[0]),int(color[1]),int(color[2])))
-                elif mode == 1:
-                    pencilData.draw = False
+                elif mode[0] == 1:
+                    paletteData.draw = False
                     filling(out_bin, pos, color, output_window_name)
-                show_img = cv2.addWeighted(read_raw, 0.9, out_bin, 0.1, 0)
+                show_img = cv2.addWeighted(read_raw, mode[1]/100, out_bin, 1-mode[1]/100, 0)
 
             cv2.imshow(window_name,show_img)
             cv2.imshow(output_window_name,out_bin)
+            cv2.imshow(palette_name,palette_img)
     except:
         import traceback
         print(traceback.format_exc())
