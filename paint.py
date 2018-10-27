@@ -104,8 +104,8 @@ def ColorPalette():
 
 if __name__ == "__main__":
     try:
-        read_raw = cv2.imread("raw_img/img_432.png")
-        read_bin = cv2.imread("bin_img/img_432.png")
+        read_raw = cv2.imread("raw_img/img_800.png")
+        read_bin = cv2.imread("bin_img/img_800.png")
         out_bin = np.copy(read_bin)
         show_img = cv2.addWeighted(read_raw, 0.9, read_bin, 0.1, 0)
 
