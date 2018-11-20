@@ -1,6 +1,8 @@
 ﻿#-*-coding:utf-8-*-
 import cv2
 import numpy as np
+import tkinter
+import tkinter.messagebox as tkmsg
 
 class mouse:
     def __init__(self, input_img_name):
@@ -104,6 +106,9 @@ def ColorPalette():
 
 if __name__ == "__main__":
     try:
+        root = tkinter.Tk()
+        root.withdraw()
+
         read_raw = cv2.imread("raw_img/img_800.png")
         read_bin = cv2.imread("bin_img/img_800.png")
         out_bin = np.copy(read_bin)
@@ -123,9 +128,11 @@ if __name__ == "__main__":
         while True:
             
             k = cv2.waitKey(1)
-            if mouseData.getEvent() == cv2.EVENT_LBUTTONDOWN:
+            mouseevent = mouseData.getEvent()
+            paletteevent = paletteData.cursor.getEvent()
+            if mouseevent == cv2.EVENT_LBUTTONDOWN:
                 paletteData.draw = True
-            elif mouseData.getEvent() == cv2.EVENT_LBUTTONUP:    
+            elif mouseevent == cv2.EVENT_LBUTTONUP:    
                 paletteData.draw = False
             elif k == ord('Q') or k == ord('q'):
                 break
@@ -133,8 +140,10 @@ if __name__ == "__main__":
                 read_raw = cv2.flip(read_raw,0)
                 out_bin = cv2.flip(out_bin,0)
                 
-            elif paletteData.cursor.getEvent() == cv2.EVENT_LBUTTONDOWN:
+            elif paletteevent == cv2.EVENT_LBUTTONDOWN:
                 paletteData.getColor()
+            elif k == ord('o') or k == ord('O'):
+                tkmsg.showwarning("test message", "This Window is a test.")
 
             if paletteData.draw == True:
                 pos = mouseData.getPos()
