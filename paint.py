@@ -1,7 +1,9 @@
 ﻿#-*-coding:utf-8-*-
+import os
 import cv2
 import numpy as np
 import tkinter
+import tkinter.filedialog as tkfd
 import tkinter.messagebox as tkmsg
 
 class mouse:
@@ -108,6 +110,9 @@ if __name__ == "__main__":
     try:
         root = tkinter.Tk()
         root.withdraw()
+        fileType = [("","*.png")]
+        raw_path = "raw_img"
+        bin_path = "bin_img"
 
         read_raw = cv2.imread("raw_img/img_800.png")
         read_bin = cv2.imread("bin_img/img_800.png")
@@ -134,16 +139,26 @@ if __name__ == "__main__":
                 paletteData.draw = True
             elif mouseevent == cv2.EVENT_LBUTTONUP:    
                 paletteData.draw = False
-            elif k == ord('Q') or k == ord('q'):
+            elif k == ord('Q') or k == ord('q'):# quit
                 break
-            elif k == ord('r') or k == ord('R'):
+            elif k == ord('r') or k == ord('R'):# flip img
                 read_raw = cv2.flip(read_raw,0)
                 out_bin = cv2.flip(out_bin,0)
                 
-            elif paletteevent == cv2.EVENT_LBUTTONDOWN:
+            elif paletteevent == cv2.EVENT_LBUTTONDOWN:# get color from palette
                 paletteData.getColor()
-            elif k == ord('o') or k == ord('O'):
-                tkmsg.showwarning("test message", "This Window is a test.")
+
+            elif k == ord('o') or k == ord('O'):# open files
+                CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
+                bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
+                raw_file = bin_file.replace(bin_path, raw_path)
+                tkmsg.showinfo("Open file", bin_file + '\n' + raw_file)
+
+            elif k == ord('s') or k == ord('S'):# save files
+                CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
+                bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
+                raw_file = bin_file.replace(bin_path, raw_path)
+                tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
 
             if paletteData.draw == True:
                 pos = mouseData.getPos()
@@ -181,5 +196,9 @@ if __name__ == "__main__":
     finally:
         cv2.destroyAllWindows()
         k = input("Save? : ")
+        flag = tkmsg.askyesno("Save", "Save this file?")
         if k == 'y' or k == 'Y':
             cv2.imwrite("bin_img/img_433.png",out_bin)
+
+        input(flag)
+
