@@ -110,12 +110,16 @@ if __name__ == "__main__":
     try:
         root = tkinter.Tk()
         root.withdraw()
-        fileType = [("","*.png")]
+        fileType = [("PNG","*.png"),("All Files",'*')]
         raw_path = "raw_img"
         bin_path = "bin_img"
+        CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
+        bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
+        raw_file = bin_file.replace(bin_path, raw_path)
+        save_flag = False
 
-        read_raw = cv2.imread("raw_img/img_800.png")
-        read_bin = cv2.imread("bin_img/img_800.png")
+        read_raw = cv2.imread(raw_file)
+        read_bin = cv2.imread(bin_file)
         out_bin = np.copy(read_bin)
         show_img = cv2.addWeighted(read_raw, 0.9, read_bin, 0.1, 0)
 
@@ -137,6 +141,7 @@ if __name__ == "__main__":
             paletteevent = paletteData.cursor.getEvent()
             if mouseevent == cv2.EVENT_LBUTTONDOWN:
                 paletteData.draw = True
+                save_flag = False
             elif mouseevent == cv2.EVENT_LBUTTONUP:    
                 paletteData.draw = False
             elif k == ord('Q') or k == ord('q'):# quit
@@ -144,7 +149,7 @@ if __name__ == "__main__":
             elif k == ord('r') or k == ord('R'):# flip img
                 read_raw = cv2.flip(read_raw,0)
                 out_bin = cv2.flip(out_bin,0)
-                
+                save_flag = False
             elif paletteevent == cv2.EVENT_LBUTTONDOWN:# get color from palette
                 paletteData.getColor()
 
@@ -159,6 +164,7 @@ if __name__ == "__main__":
                 bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
                 raw_file = bin_file.replace(bin_path, raw_path)
                 tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
+                save_flag = True
 
             if paletteData.draw == True:
                 pos = mouseData.getPos()
@@ -195,10 +201,13 @@ if __name__ == "__main__":
         print(traceback.format_exc())
     finally:
         cv2.destroyAllWindows()
-        k = input("Save? : ")
-        flag = tkmsg.askyesno("Save", "Save this file?")
-        if k == 'y' or k == 'Y':
-            cv2.imwrite("bin_img/img_433.png",out_bin)
-
-        input(flag)
+        if save_flag == False:
+            flag = tkmsg.askyesno("Save", "Save this file?")
+            if flag == True:
+                bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory)
+            elif flag == False:
+                bin_file = ""
+            if bin_file == '':
+                bin_file = "No File was Saved!"
+            input(bin_file)
 
