@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
             elif k == ord('s') or k == ord('S'):# save files
                 CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
-                bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
+                bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory)
                 raw_file = bin_file.replace(bin_path, raw_path)
                 tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
                 save_flag = True
@@ -207,6 +207,7 @@ if __name__ == "__main__":
                 bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory)
             elif flag == False:
                 bin_file = ""
+
             if bin_file == '':
                 bin_file = "No File was Saved!"
             input(bin_file)
