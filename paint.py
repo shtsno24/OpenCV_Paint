@@ -116,6 +116,7 @@ if __name__ == "__main__":
         CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
         bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
         raw_file = bin_file.replace(bin_path, raw_path)
+        file_name = bin_file.split('/')[-1]
         save_flag = False
 
         read_raw = cv2.imread(raw_file)
@@ -157,13 +158,23 @@ if __name__ == "__main__":
                 CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
                 bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
                 raw_file = bin_file.replace(bin_path, raw_path)
+                file_name = bin_file.split('/')[-1]
+                read_raw = cv2.imread(raw_file)
+                out_bin = cv2.imread(bin_file)
                 tkmsg.showinfo("Open file", bin_file + '\n' + raw_file)
 
             elif k == ord('s') or k == ord('S'):# save files
                 CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
-                bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory)
+                
+                bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory,initialfile=file_name)
+                if bin_file.find(".png") == -1:
+                    bin_file += ".png"
+
                 raw_file = bin_file.replace(bin_path, raw_path)
-                tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
+                if(bin_file.find("/.png") == -1):
+                    cv2.imwrite(bin_file, out_bin)
+                    cv2.imwrite(raw_file, read_raw)
+                    tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
                 save_flag = True
 
             if paletteData.draw == True:
@@ -192,7 +203,7 @@ if __name__ == "__main__":
                     filling(out_bin, pos, color, output_window_name)
 
             mode = paletteData.getMode()
-            show_img = cv2.addWeighted(read_raw, float(mode[1])/100.0, out_bin, 1.0-float(mode[1])/100.0, 0)
+            show_img = cv2.addWeighted(read_raw, float(mode[1]) / 100.0, out_bin, 1.0 - float(mode[1]) / 100.0, 0)
             cv2.imshow(window_name,show_img)
             cv2.imshow(output_window_name,out_bin)
             cv2.imshow(palette_name,palette_img)
