@@ -170,8 +170,9 @@ if __name__ == "__main__":
                 if bin_file.find(".png") == -1:
                     bin_file += ".png"
 
+                print(bin_file)
                 raw_file = bin_file.replace(bin_path, raw_path)
-                if(bin_file.find("/.png") == -1):
+                if(bin_file.find(".png") != 0):
                     cv2.imwrite(bin_file, out_bin)
                     cv2.imwrite(raw_file, read_raw)
                     tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
