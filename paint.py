@@ -115,14 +115,16 @@ if __name__ == "__main__":
         bin_path = "bin_img"
         CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
         bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
-        raw_file = bin_file.replace(bin_path, raw_path)
-        file_name = bin_file.split('/')[-1]
+        if bin_file != '':
+            raw_file = bin_file.replace(bin_path, raw_path)
+            file_name = bin_file.split('/')[-1]
+            read_raw = cv2.imread(raw_file)
+            read_bin = cv2.imread(bin_file)
+            out_bin = np.copy(read_bin)
+            show_img = cv2.addWeighted(read_raw, 0.9, read_bin, 0.1, 0)
         save_flag = False
 
-        read_raw = cv2.imread(raw_file)
-        read_bin = cv2.imread(bin_file)
-        out_bin = np.copy(read_bin)
-        show_img = cv2.addWeighted(read_raw, 0.9, read_bin, 0.1, 0)
+        
 
         window_name = "img"
         output_window_name = "output"
@@ -157,26 +159,31 @@ if __name__ == "__main__":
             elif k == ord('o') or k == ord('O'):# open files
                 CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
                 bin_file = tkfd.askopenfilename(filetypes = fileType,initialdir = CurrentDirectory)
-                raw_file = bin_file.replace(bin_path, raw_path)
-                file_name = bin_file.split('/')[-1]
-                read_raw = cv2.imread(raw_file)
-                out_bin = cv2.imread(bin_file)
+                if bin_file != '':
+                    raw_file = bin_file.replace(bin_path, raw_path)
+                    file_name = bin_file.split('/')[-1]
+                    read_raw = cv2.imread(raw_file)
+                    out_bin = cv2.imread(bin_file)
                 tkmsg.showinfo("Open file", bin_file + '\n' + raw_file)
 
             elif k == ord('s') or k == ord('S'):# save files
                 CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
+                if os.path.exists(bin_path) == False:
+                    os.mkdir(bin_path)
+                if os.path.exists(raw_path) == False:
+                    os.mkdir(raw_path)
                 
                 bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory,initialfile=file_name)
+                
                 if bin_file.find(".png") == -1:
                     bin_file += ".png"
 
-                print(bin_file)
                 raw_file = bin_file.replace(bin_path, raw_path)
                 if(bin_file.find(".png") != 0):
                     cv2.imwrite(bin_file, out_bin)
                     cv2.imwrite(raw_file, read_raw)
                     tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
-                save_flag = True
+                    save_flag = True
 
             if paletteData.draw == True:
                 pos = mouseData.getPos()
@@ -216,7 +223,17 @@ if __name__ == "__main__":
         if save_flag == False:
             flag = tkmsg.askyesno("Save", "Save this file?")
             if flag == True:
-                bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory)
+                CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
+                
+                bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory,initialfile=file_name)
+                if bin_file.find(".png") == -1:
+                    bin_file += ".png"
+
+                raw_file = bin_file.replace(bin_path, raw_path)
+                if(bin_file.find(".png") != 0):
+                    cv2.imwrite(bin_file, out_bin)
+                    cv2.imwrite(raw_file, read_raw)
+                    tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
             elif flag == False:
                 bin_file = ""
 
