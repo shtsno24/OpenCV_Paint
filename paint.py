@@ -168,22 +168,28 @@ if __name__ == "__main__":
 
             elif k == ord('s') or k == ord('S'):# save files
                 CurrentDirectory = os.path.abspath(os.path.dirname(__file__))
-                if os.path.exists(bin_path) == False:
-                    os.mkdir(bin_path)
-                if os.path.exists(raw_path) == False:
-                    os.mkdir(raw_path)
-                
                 bin_file = tkfd.asksaveasfilename(filetypes = fileType,initialdir = CurrentDirectory,initialfile=file_name)
-                
+                raw_file = bin_file.replace(bin_path, raw_path)
+
                 if bin_file.find(".png") == -1:
                     bin_file += ".png"
+                    raw_file += ".png"
 
-                raw_file = bin_file.replace(bin_path, raw_path)
                 if(bin_file.find(".png") != 0):
+
+                    if bin_file.find(bin_path) == -1:
+                        save_file_name = bin_file.split('/')[-1]
+                        if os.path.exists(bin_file.replace(bin_file.split('/')[-1], bin_path)) == False:
+                            os.mkdir(bin_file.replace(save_file_name, bin_path))
+                            os.mkdir(raw_file.replace(save_file_name, raw_path))
+                        bin_file = bin_file.replace(save_file_name, bin_path) + '/' + save_file_name
+                        raw_file = raw_file.replace(save_file_name, raw_path) + '/' + save_file_name
+                    tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
                     cv2.imwrite(bin_file, out_bin)
                     cv2.imwrite(raw_file, read_raw)
-                    tkmsg.showinfo("Save file", bin_file + '\n' + raw_file)
                     save_flag = True
+
+                
 
             if paletteData.draw == True:
                 pos = mouseData.getPos()
