@@ -38,7 +38,7 @@ class mouse:
 
 class palette:
     def __init__(self, input_img_name, input_img):
-        cv2.createTrackbar('alpha', input_img_name, 0, 100, self.__CallBackFunc)
+        cv2.createTrackbar('alpha', input_img_name, 0, 180, self.__CallBackFunc)
         cv2.createTrackbar("Mode", input_img_name, 0, 1, self.__CallBackFunc)
         self.cursor = mouse(input_img_name)
         self.input_img_name = input_img_name
@@ -217,7 +217,7 @@ if __name__ == "__main__":
                     filling(out_bin, pos, color, output_window_name)
 
             mode = paletteData.getMode()
-            show_img = cv2.addWeighted(read_raw, float(mode[1]) / 100.0, out_bin, 1.0 - float(mode[1]) / 100.0, 0)
+            show_img = cv2.addWeighted(read_raw, float(mode[1]) / 100.0, out_bin, 1.8 - float(mode[1]) / 100.0, 0)
             cv2.imshow(window_name,show_img)
             cv2.imshow(output_window_name,out_bin)
             cv2.imshow(palette_name,palette_img)
